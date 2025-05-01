@@ -1,15 +1,22 @@
 <?php
+// Estas líneas DEBEN ir al principio absoluto, antes de cualquier espacio en blanco
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Buffer de salida para evitar errores de cabeceras
+ob_start();
+
+// Cabeceras CORS
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-require_once __DIR__ . '/../../models/Products.php';
-require_once __DIR__ . '/../../config/database.php';
+// Incluir archivos con rutas absolutas
+require_once realpath(__DIR__ . '/../../models/Products.php');
+require_once realpath(__DIR__ . '/../../config/database.php');
+
 
 // Conectar a la base de datos
 $database = new Database();
