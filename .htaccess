@@ -4,8 +4,17 @@
 #RewriteCond %{REQUEST_URI} !^/public/
 #RewriteRule ^(.*)$ public/$1 [L]
 
+#<IfModule mod_rewrite.c>
+ # RewriteEngine On
+  #RewriteRule ^$ public/ [L]
+  #RewriteRule (.*) public/$1 [L]
+#</IfModule>
+
 <IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteRule ^$ public/ [L]
-  RewriteRule (.*) public/$1 [L]
+    RewriteEngine On
+    RewriteBase /proyecto-crud/
+    
+    # Redirigir todo a /public/ excepto si ya es /public/
+    RewriteCond %{REQUEST_URI} !^/proyecto-crud/public/
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
