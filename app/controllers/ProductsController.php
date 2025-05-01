@@ -8,16 +8,15 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-require_once __DIR__ . '../../models/Products.php';
-require_once __DIR__ . '../../config/database.php';
+require_once __DIR__ . '/../../models/Products.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Conectar a la base de datos
 $database = new Database();
 $db = $database->connect();
 
 // Instanciar el modelo Producto
-$producto = new Producto($db);
-
+$producto = new Products($db); 
 // Obtener el método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
