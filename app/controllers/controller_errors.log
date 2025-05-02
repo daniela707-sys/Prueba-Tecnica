@@ -1,0 +1,16 @@
+[02-May-2025 15:07:40 Europe/Berlin] PHP Warning:  Undefined array key "nombre" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 51
+[02-May-2025 15:07:40 Europe/Berlin] PHP Warning:  Undefined array key "descripcion" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 52
+[02-May-2025 15:07:40 Europe/Berlin] PHP Warning:  Undefined array key "precio" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 53
+[02-May-2025 15:07:40 Europe/Berlin] PHP Warning:  Undefined array key "stock" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 54
+[02-May-2025 15:08:01 Europe/Berlin] PHP Warning:  Undefined array key "nombre" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 51
+[02-May-2025 15:08:01 Europe/Berlin] PHP Warning:  Undefined array key "descripcion" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 52
+[02-May-2025 15:08:01 Europe/Berlin] PHP Warning:  Undefined array key "precio" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 53
+[02-May-2025 15:08:01 Europe/Berlin] PHP Warning:  Undefined array key "stock" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 54
+[02-May-2025 15:08:22 Europe/Berlin] PHP Warning:  Undefined array key "nombre" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 51
+[02-May-2025 15:08:22 Europe/Berlin] PHP Warning:  Undefined array key "descripcion" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 52
+[02-May-2025 15:08:22 Europe/Berlin] PHP Warning:  Undefined array key "precio" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 53
+[02-May-2025 15:08:22 Europe/Berlin] PHP Warning:  Undefined array key "stock" in C:\xampp\htdocs\PruebaTecnica\app\controllers\ProductsController.php on line 54
+[02-May-2025 16:01:34 Europe/Berlin] Imagen guardada en: C:/xampp/htdocs/PruebaTecnica/public/uploads/6814d03ed4fce.jpg
+[02-May-2025 16:01:34 Europe/Berlin] URL accesible: http://localhost/PruebaTecnica/public/uploads/6814d03ed4fce.jpg
+[02-May-2025 16:38:31 Europe/Berlin] Imagen guardada en: C:/xampp/htdocs/PruebaTecnica/public/uploads/6814d8e73268c.jpg
+[02-May-2025 16:38:31 Europe/Berlin] URL accesible: http://localhost/PruebaTecnica/public/uploads/6814d8e73268c.jpg

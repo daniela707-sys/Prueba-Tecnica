@@ -1,126 +1,139 @@
 <?php
-// Estas líneas DEBEN ir al principio absoluto, antes de cualquier espacio en blanco
+ob_start();
+header('Content-Type: application/json; charset=utf-8');
+
+// Configuración de errores
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/controller_errors.log');
 error_reporting(E_ALL);
 
-// Buffer de salida para evitar errores de cabeceras
-ob_start();
+// CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Cabeceras CORS
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+// Incluir dependencias
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/Products.php';
 
-// Incluir archivos con rutas absolutas
-require_once realpath(__DIR__ . '/../../models/Products.php');
-require_once realpath(__DIR__ . '/../../config/database.php');
+try {
+    $database = new Database();
+    $db = $database->connect();
+    $producto = new Products($db);
 
+    $method = $_SERVER['REQUEST_METHOD'];
+    
+    switch ($method) {
+        case 'GET':
+            $stmt = $producto->obtenerTodos();
+            $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($productos);
+            break;
 
-// Conectar a la base de datos
-$database = new Database();
-$db = $database->connect();
-
-// Instanciar el modelo Producto
-$producto = new Products($db); 
-// Obtener el método de la solicitud
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Manejar diferentes métodos
-switch($method) {
-    case 'GET':
-        // Leer productos
-        if(isset($_GET['id'])) {
-            // Leer un solo producto
-            $producto->id = $_GET['id'];
-            $stmt = $producto->leer_uno($producto->id);
-            $num = $stmt->rowCount();
-
-            if($num > 0) {
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo json_encode($row);
-            } else {
-                echo json_encode(array('mensaje' => 'Producto no encontrado'));
-            }
-        } else {
-            // Leer todos los productos
-            $stmt = $producto->leer();
-            $num = $stmt->rowCount();
-
-            if($num > 0) {
-                $productos_arr = array();
-                $productos_arr['data'] = array();
-
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    extract($row);
-                    $producto_item = array(
-                        'id' => $id,
-                        'nombre' => $nombre,
-                        'descripcion' => $descripcion,
-                        'precio' => $precio,
-                        'stock' => $stock,
-                        'fecha_creacion' => $fecha_creacion
-                    );
-                    array_push($productos_arr['data'], $producto_item);
+        case 'POST':
+            // Validar campos requeridos
+            $required = ['nombre', 'descripcion', 'precio', 'stock'];
+            foreach ($required as $field) {
+                if (empty($_POST[$field])) {
+                    throw new Exception("El campo $field es requerido");
                 }
-                echo json_encode($productos_arr);
-            } else {
-                echo json_encode(array('mensaje' => 'No se encontraron productos'));
             }
-        }
-        break;
 
-    case 'POST':
-        // Crear producto
-        $data = json_decode(file_get_contents("php://input"));
+            // Manejo de imagen
+            $imagen = '';
+            // Dentro del case 'POST':
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/PruebaTecnica/public/uploads/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                
+                $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid() . '.' . $extension;
+                $targetPath = $uploadDir . $filename;
+                
+                if (move_uploaded_file($_FILES['imagen']['tmp_name'], $targetPath)) {
+                    $imagen = $filename;
+                    // Agrega este log para verificar
+                    error_log("Imagen guardada en: " . $targetPath);
+                    error_log("URL accesible: http://" . $_SERVER['HTTP_HOST'] . '/PruebaTecnica/public/uploads/' . $filename);
+                }
+            }
+            
+            $result = $producto->crear(
+                $_POST['nombre'],
+                $_POST['descripcion'],
+                $_POST['precio'],
+                $_POST['stock'],
+                $imagen
+            );
+            
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 'Producto creado' : 'Error al crear producto'
+            ]);
+            break;
 
-        $producto->nombre = $data->nombre;
-        $producto->descripcion = $data->descripcion;
-        $producto->precio = $data->precio;
-        $producto->stock = $data->stock;
+        case 'PUT':
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('JSON inválido');
+            }
 
-        if($producto->crear()) {
-            echo json_encode(array('mensaje' => 'Producto creado'));
-        } else {
-            echo json_encode(array('mensaje' => 'Producto no creado'));
-        }
-        break;
+            // Validar campos requeridos
+            $required = ['id', 'nombre', 'descripcion', 'precio', 'stock'];
+            foreach ($required as $field) {
+                if (empty($data[$field])) {
+                    throw new Exception("El campo $field es requerido");
+                }
+            }
 
-    case 'PUT':
-        // Actualizar producto
-        $data = json_decode(file_get_contents("php://input"));
+            $result = $producto->actualizar(
+                $data['id'],
+                $data['nombre'],
+                $data['descripcion'],
+                $data['precio'],
+                $data['stock'],
+                $data['imagen'] ?? null
+            );
+            
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 'Producto actualizado' : 'Error al actualizar'
+            ]);
+            break;
 
-        $producto->id = $data->id;
-        $producto->nombre = $data->nombre;
-        $producto->descripcion = $data->descripcion;
-        $producto->precio = $data->precio;
-        $producto->stock = $data->stock;
+        case 'DELETE':
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (empty($data['id'])) {
+                throw new Exception('ID del producto es requerido');
+            }
 
-        if($producto->actualizar()) {
-            echo json_encode(array('mensaje' => 'Producto actualizado'));
-        } else {
-            echo json_encode(array('mensaje' => 'Producto no actualizado'));
-        }
-        break;
+            $result = $producto->eliminar($data['id']);
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 'Producto eliminado' : 'Error al eliminar'
+            ]);
+            break;
 
-    case 'DELETE':
-        // Eliminar producto
-        $data = json_decode(file_get_contents("php://input"));
-
-        $producto->id = $data->id;
-
-        if($producto->eliminar()) {
-            echo json_encode(array('mensaje' => 'Producto eliminado'));
-        } else {
-            echo json_encode(array('mensaje' => 'Producto no eliminado'));
-        }
-        break;
-
-    default:
-        // Método no soportado
-        http_response_code(405);
-        echo json_encode(array('mensaje' => 'Método no permitido'));
-        break;
+        default:
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+    }
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error de base de datos',
+        'error' => $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
+} finally {
+    ob_end_flush();
 }
-?>

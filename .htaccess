@@ -10,11 +10,15 @@
   #RewriteRule (.*) public/$1 [L]
 #</IfModule>
 
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /Prueba-Tecnica/
+RewriteEngine On
+RewriteBase /PruebaTecnica/
 
-    # Redirigir todo a /public/ excepto si ya está ahí
-    RewriteCond %{REQUEST_URI} !^/Prueba-Tecnica/public/
-    RewriteRule ^(.*)$ public/$1 [L]
-</IfModule>
+# Redirigir todo a public/ si no es una petición a archivos existentes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Permitir acceso directo a archivos en uploads
+RewriteCond %{REQUEST_URI} ^/PruebaTecnica/public/uploads/ [NC]
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Reglas API - IMPORTANTE: usa rutas absolutas desde la raíz del servidor
+RewriteRule ^api/products/?$ /PruebaTecnica/app/controllers/ProductsController.php [L,QSA]
