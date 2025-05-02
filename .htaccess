@@ -12,9 +12,9 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /proyecto-crud/
-    
-    # Redirigir todo a /public/ excepto si ya es /public/
-    RewriteCond %{REQUEST_URI} !^/proyecto-crud/public/
+    RewriteBase /Prueba-Tecnica/
+
+    # Redirigir todo a /public/ excepto si ya está ahí
+    RewriteCond %{REQUEST_URI} !^/Prueba-Tecnica/public/
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
